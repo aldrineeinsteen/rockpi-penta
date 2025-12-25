@@ -56,6 +56,9 @@ class Gpio:
 
     def __init__(self, period_s):
         chip_path = os.environ['FAN_CHIP']
+        # GPIOD v2 requires /dev/gpiochipX path
+        if not chip_path.startswith('/dev/'):
+            chip_path = f'/dev/gpiochip{chip_path}'
         line_offset = int(os.environ['FAN_LINE'])
         
         # GPIOD v2 API
@@ -105,7 +108,7 @@ def change_dc(dc, cache={}):
 
 def running():
     global pin
-    if os.environ['HARDWARE_PWM'] == '1':
+    if os.environ.get('HARDWARE_PWM', '0') == '1':
         chip = os.environ['PWMCHIP']
         pin = Pwm(chip)
         pin.period_us(40)

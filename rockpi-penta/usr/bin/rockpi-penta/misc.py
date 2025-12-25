@@ -96,6 +96,9 @@ def read_conf():
 
 def read_key(pattern, size):
     CHIP_NAME = os.environ['BUTTON_CHIP']
+    # GPIOD v2 requires /dev/gpiochipX path
+    if not CHIP_NAME.startswith('/dev/'):
+        CHIP_NAME = f'/dev/gpiochip{CHIP_NAME}'
     LINE_NUMBER = int(os.environ['BUTTON_LINE'])
 
     s = ''
