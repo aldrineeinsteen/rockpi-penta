@@ -53,13 +53,16 @@ line_request = gpiod.request_lines(
     consumer='hat_button',
     config={
         LINE_NUMBER: gpiod.LineSettings(
-            direction=gpiod.line.Direction.OUTPUT,
-            output_value=gpiod.line.Value.ACTIVE
+            direction=gpiod.line.Direction.INPUT,
+            bias=gpiod.line.Bias.PULL_UP
         )
     }
 )
 
+# IMPORTANT: get_value() returns Value enum, not int
 value = line_request.get_value(LINE_NUMBER)
+# Convert: Value.ACTIVE = 1, Value.INACTIVE = 0
+int_value = 1 if value == gpiod.line.Value.ACTIVE else 0
 ```
 
 ### 3. DEBIAN/control
@@ -73,8 +76,27 @@ value = line_request.get_value(LINE_NUMBER)
 |----------|----------|
 | `gpiod.Chip()` + `get_line()` | `gpiod.request_lines()` |
 | `line.request(type=gpiod.LINE_REQ_DIR_OUT)` | `gpiod.LineSettings(direction=gpiod.line.Direction.OUTPUT)` |
+| `line.request(type=gpiod.LINE_REQ_DIR_IN)` | `gpiod.LineSettings(direction=gpiod.line.Direction.INPUT)` |
 | `line.set_value(1)` / `line.set_value(0)` | `line_request.set_value(offset, gpiod.line.Value.ACTIVE/INACTIVE)` |
-| `line.get_value()` | `line_request.get_value(offset)` |
+| `line.get_value()` returns `int` | `line_request.get_value(offset)` returns `Value` enum |
+
+## Important Notes
+
+### Value Enum Handling
+In GPIOD v2, `get_value()` returns a `gpiod.line.Value` enum, NOT an integer:
+- `Value.ACTIVE` = logical high (1)
+- `Value.INACTIVE` = logical low (0)
+
+You must convert explicitly:
+```python
+value = line_request.get_value(offset)
+int_value = 1 if value == gpiod.line.Value.ACTIVE else 0
+```
+
+### GPIO Direction
+- **OUTPUT**: For controlling devices (fan, LEDs, etc.)
+- **INPUT**: For reading sensors, buttons, etc.
+- Remember to set appropriate bias for inputs: `bias=gpiod.line.Bias.PULL_UP` or `PULL_DOWN`
 
 ## Testing Requirements
 
