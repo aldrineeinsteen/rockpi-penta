@@ -60,7 +60,7 @@ sudo systemctl disable rockpi-penta  # Disable on boot
 ## ⚙️ Configuration
 
 ### Main Configuration
-Edit `/etc/rockpi-penta.conf`:
+Edit `/etc/rockpi-penta.conf` for user preferences:
 ```ini
 [fan]
 lv0 = 35
@@ -86,8 +86,21 @@ rotate = False
 f-temp = False
 ```
 
-### Environment Variables
-The environment file is auto-generated based on your board model: `/etc/rockpi-penta.env`
+### Hardware Configuration
+Hardware-specific settings are in `/etc/rockpi-penta.env` (auto-generated based on your board):
+```bash
+# Example for Raspberry Pi 5
+BUTTON_CHIP=4
+BUTTON_LINE=17
+FAN_CHIP=4
+FAN_LINE=27
+HARDWARE_PWM=0
+SDA=SDA
+SCL=SCL
+OLED_RESET=D23
+```
+
+**Note:** The env file is automatically created during installation. Only modify if you need custom GPIO pin assignments.
 
 ## 🔍 Troubleshooting
 
